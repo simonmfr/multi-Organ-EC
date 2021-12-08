@@ -1,121 +1,185 @@
-a=read.csv("cells.csv")
+library(Seurat)
+
+data_path <- "//isdsynnas.srv.med.uni-muenchen.de/BD-Dichgans/SF/P6_PC_EC_scRNAseq/Paik/TabulaMuris"
+
+a=read.csv("cells.csv.gz")
+
+#load("//isdsynnas.srv.med.uni-muenchen.de/BD-Dichgans/SF/P6_PC_EC_scRNAseq/Paik/EC.TSNE.Robj") # alternative: provided by Paik as "processed R object"
+#EC <- UpdateSeuratObject(EC)
 
 t="Aorta"
-load(paste("../data/facs_",t,"_seurat_tiss.Robj",sep=""))
-tiss@meta.data$orig.ident=rep(t,length(tiss@meta.data$orig.ident))
-b=as.vector(a[which(a$tissue==t),"cell"])
-EC=SubsetData(tiss, cells.use = b) 
-rm(tiss)
+load(paste(data_path, "/data/facs_",t,"_seurat_tiss.Robj",sep="")); tiss <- UpdateSeuratObject(tiss) 
+#head(tiss@meta.data)
+tiss@meta.data$orig.ident=rep(t,length(tiss@meta.data$orig.ident)) # aim: replace meta.data entry "orig.ident" with same value containing "" ; causes error
+b=as.vector(a[which(a$tissue==t),"cell"]) # create vector of cell ids from respective tissue, based on cells.csv file
+# EC=SubsetData(tiss, cells.use = b) # filter cells to use ECs only ; function deprecated ; new version see below:
+ext <- rownames(tiss@meta.data) %in% b # create list of cells to extract
+EC <- tiss[,ext] # subset seurat files
+#
+rm(tiss); rm(ext)
 EC@meta.data$subannotation=rep("EC",nrow(EC@meta.data))
 
+
 t="Brain_Non-Myeloid"
-load(paste("../data/facs_",t,"_seurat_tiss.Robj",sep=""))
+load(paste(data_path,"/data/facs_",t,"_seurat_tiss.Robj",sep="")); tiss <- UpdateSeuratObject(tiss) 
 tiss@meta.data$orig.ident=rep("Brain",length(tiss@meta.data$orig.ident))
 b=as.vector(a[which(a$tissue=="Brain_Non-Myeloid"),"cell"])
-tmp=SubsetData(tiss, cells.use = b) 
-EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id1="Aorta",add.cell.id2="Brain",do.normalize = FALSE)
-rm(tiss)
+#tmp=SubsetData(tiss, cells.use = b) 
+ext <- rownames(tiss@meta.data) %in% b # create list of cells to extract
+tmp <- tiss[,ext] # subset seurat files
+#
+#EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id1="Aorta",add.cell.id2="Brain",do.normalize = FALSE) # "MergeSeurat" was replaced by "merge"
+EC<-merge(EC,y=tmp,merge.data=T) # "MergeSeurat" was replaced by "merge"
+rm(tiss); rm(ext)
 
 
 t="Diaphragm"
-load(paste("../data/facs_",t,"_seurat_tiss.Robj",sep=""))
+load(paste(data_path,"/data/facs_",t,"_seurat_tiss.Robj",sep="")); tiss <- UpdateSeuratObject(tiss) 
 tiss@meta.data$orig.ident=rep(t,length(tiss@meta.data$orig.ident))
 b=as.vector(a[which(a$tissue==t),"cell"])
-tmp=SubsetData(tiss, cells.use = b) 
+# tmp=SubsetData(tiss, cells.use = b)
+ext <- rownames(tiss@meta.data) %in% b # create list of cells to extract
+tmp <- tiss[,ext] # subset seurat files
+#
 tmp@meta.data$subannotation=rep("EC",nrow(tmp@meta.data))
-EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
-rm(tiss)
+#EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
+EC<-merge(EC,y=tmp,merge.data=T) # "MergeSeurat" was replaced by "merge"
+rm(tiss); rm(ext)
 
 t="Fat"
-load(paste("../data/facs_",t,"_seurat_tiss.Robj",sep=""))
+load(paste(data_path,"/data/facs_",t,"_seurat_tiss.Robj",sep="")); tiss <- UpdateSeuratObject(tiss) 
 tiss@meta.data$orig.ident=rep(t,length(tiss@meta.data$orig.ident))
 b=as.vector(a[which(a$tissue==t),"cell"])
-tmp=SubsetData(tiss, cells.use = b) 
+#tmp=SubsetData(tiss, cells.use = b) 
+ext <- rownames(tiss@meta.data) %in% b # create list of cells to extract
+tmp <- tiss[,ext] # subset seurat files
+#
 tmp@meta.data$subannotation=rep("EC",nrow(tmp@meta.data))
-EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
-rm(tiss)
+#EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
+EC<-merge(EC,y=tmp,merge.data=T)
+rm(tiss); rm(ext)
 
 t="Heart"
-load(paste("../data/facs_",t,"_seurat_tiss.Robj",sep=""))
+load(paste(data_path,"/data/facs_",t,"_seurat_tiss.Robj",sep="")); tiss <- UpdateSeuratObject(tiss) 
 tiss@meta.data$orig.ident=rep(t,length(tiss@meta.data$orig.ident))
 b=as.vector(a[which(a$tissue==t),"cell"])
-tmp=SubsetData(tiss, cells.use = b) 
+#tmp=SubsetData(tiss, cells.use = b) 
+ext <- rownames(tiss@meta.data) %in% b # create list of cells to extract
+tmp <- tiss[,ext] # subset seurat files
+#
 tmp@meta.data$subannotation=rep("EC",nrow(tmp@meta.data))
-EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
-rm(tiss)
+#EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
+EC<-merge(EC,y=tmp,merge.data=T)
+rm(tiss); rm(ext)
 
 t="Kidney"
-load(paste("../data/facs_",t,"_seurat_tiss.Robj",sep=""))
+load(paste(data_path,"/data/facs_",t,"_seurat_tiss.Robj",sep="")); tiss <- UpdateSeuratObject(tiss) 
 tiss@meta.data$orig.ident=rep(t,length(tiss@meta.data$orig.ident))
 b=as.vector(a[which(a$tissue==t),"cell"])
-tmp=SubsetData(tiss, cells.use = b) 
+# tmp=SubsetData(tiss, cells.use = b) 
+ext <- rownames(tiss@meta.data) %in% b # create list of cells to extract
+tmp <- tiss[,ext] # subset seurat files
+#
 tmp@meta.data$subannotation=rep("EC",nrow(tmp@meta.data))
-EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
-rm(tiss)
+# EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
+EC<-merge(EC,y=tmp,merge.data=T)
+rm(tiss); rm(ext)
 
 t="Limb_Muscle"
-load(paste("../data/facs_",t,"_seurat_tiss.Robj",sep=""))
+load(paste(data_path,"/data/facs_",t,"_seurat_tiss.Robj",sep="")); tiss <- UpdateSeuratObject(tiss) 
 tiss@meta.data$orig.ident=rep(t,length(tiss@meta.data$orig.ident))
 b=as.vector(a[which(a$tissue==t),"cell"])
-tmp=SubsetData(tiss, cells.use = b) 
+#tmp=SubsetData(tiss, cells.use = b) 
+ext <- rownames(tiss@meta.data) %in% b # create list of cells to extract
+tmp <- tiss[,ext] # subset seurat files
+#
 tmp@meta.data$subannotation=rep("EC",nrow(tmp@meta.data))
-EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
-rm(tiss)
+#EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
+EC<-merge(EC,y=tmp,merge.data=T)
+rm(tiss); rm(ext)
 
 t="Liver"
-load(paste("../data/facs_",t,"_seurat_tiss.Robj",sep=""))
+load(paste(data_path,"/data/facs_",t,"_seurat_tiss.Robj",sep="")); tiss <- UpdateSeuratObject(tiss) 
 tiss@meta.data$orig.ident=rep(t,length(tiss@meta.data$orig.ident))
 b=as.vector(a[which(a$tissue==t),"cell"])
-tmp=SubsetData(tiss, cells.use = b) 
+# tmp=SubsetData(tiss, cells.use = b) 
+ext <- rownames(tiss@meta.data) %in% b # create list of cells to extract
+tmp <- tiss[,ext] # subset seurat files
+#
 tmp@meta.data$subannotation=rep("EC",nrow(tmp@meta.data))
-EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
-rm(tiss)
+#EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
+EC<-merge(EC,y=tmp,merge.data=T)
+rm(tiss); rm(ext)
 
 t="Lung"
-load(paste("../data/facs_",t,"_seurat_tiss.Robj",sep=""))
-tissue@meta.data$orig.ident=rep(t,length(tissue@meta.data$orig.ident))
+load(paste(data_path,"/data/facs_",t,"_seurat_tiss.Robj",sep="")); tiss <- UpdateSeuratObject(tiss) 
+tiss@meta.data$orig.ident=rep(t,length(tiss@meta.data$orig.ident))
 b=as.vector(a[which(a$tissue==t),"cell"])
-tmp=SubsetData(tissue, cells.use = b) 
+# tmp=SubsetData(tissue, cells.use = b) 
+ext <- rownames(tiss@meta.data) %in% b # create list of cells to extract
+tmp <- tiss[,ext] # subset seurat files
+#
 tmp@meta.data$subannotation=rep("EC",nrow(tmp@meta.data))
-EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
-rm(tissue)
+#EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
+EC<-merge(EC,y=tmp,merge.data=T)
+rm(tiss); rm(ext)
 
 t="Mammary_Gland"
-load(paste("../data/facs_",t,"_seurat_tiss.Robj",sep=""))
+load(paste(data_path,"/data/facs_",t,"_seurat_tiss.Robj",sep="")); tiss <- UpdateSeuratObject(tiss) 
 tiss@meta.data$orig.ident=rep(t,length(tiss@meta.data$orig.ident))
 b=as.vector(a[which(a$tissue==t),"cell"])
-tmp=SubsetData(tiss, cells.use = b) 
+# tmp=SubsetData(tiss, cells.use = b) 
+ext <- rownames(tiss@meta.data) %in% b # create list of cells to extract
+tmp <- tiss[,ext] # subset seurat files
+#
 tmp@meta.data$subannotation=rep("EC",nrow(tmp@meta.data))
-EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
-rm(tiss)
+#EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
+EC<-merge(EC,y=tmp,merge.data=T)
+rm(tiss); rm(ext)
 
 t="Pancreas"
-load(paste("../data/facs_",t,"_seurat_tiss.Robj",sep=""))
+load(paste(data_path,"/data/facs_",t,"_seurat_tiss.Robj",sep="")); tiss <- UpdateSeuratObject(tiss) 
 tiss@meta.data$orig.ident=rep(t,length(tiss@meta.data$orig.ident))
 b=as.vector(a[which(a$tissue==t),"cell"])
-tmp=SubsetData(tiss, cells.use = b) 
+# tmp=SubsetData(tiss, cells.use = b) 
+ext <- rownames(tiss@meta.data) %in% b # create list of cells to extract
+tmp <- tiss[,ext] # subset seurat files
+#
 tmp@meta.data$subannotation=rep("EC",nrow(tmp@meta.data))
-EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
-rm(tiss)
+#EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
+EC<-merge(EC,y=tmp,merge.data=T)
+rm(tiss); rm(ext)
 
 t="Trachea"
-load(paste("../data/facs_",t,"_seurat_tiss.Robj",sep=""))
+load(paste(data_path,"/data/facs_",t,"_seurat_tiss.Robj",sep="")); tiss <- UpdateSeuratObject(tiss) 
 tiss@meta.data$orig.ident=rep(t,length(tiss@meta.data$orig.ident))
 b=as.vector(a[which(a$tissue==t),"cell"])
-tmp=SubsetData(tiss, cells.use = b) 
+# tmp=SubsetData(tiss, cells.use = b) 
+ext <- rownames(tiss@meta.data) %in% b # create list of cells to extract
+tmp <- tiss[,ext] # subset seurat files
+#
 tmp@meta.data$subannotation=rep("EC",nrow(tmp@meta.data))
-EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
-rm(tiss)
+#EC=MergeSeurat(object1=EC,object2=tmp,add.cell.id2=t,do.normalize = FALSE)
+EC<-merge(EC,y=tmp,merge.data=T)
+rm(tiss); rm(ext)
+
+EC
+
+# here, the merged file should be integrated properly. instead, the dataset is treated as a single one 
 
 table(EC@meta.data$orig.ident)
 save(EC,file="EC.Robj")
 
-EC=FilterCells(EC,subset.names=c("nGene","nReads"),low.thresholds = c(500,50000))
+#EC=FilterCells(EC,subset.names=c("nGene","nReads"),low.thresholds = c(500,50000)) # replaced by subset
+EC=subset(EC, subset = nFeature_RNA > 500 & nReads > 5000)
 EC=NormalizeData(EC,scale.factor=1e6)
 EC=ScaleData(EC, vars.to.regress = c("nReads", "percent.ribo","percent.ercc"))
-EC=FindVariableGenes(EC,do.plot=TRUE,x.high.cutoff = Inf,y.cutoff = 0.5)
+# EC=FindVariableGenes(EC,do.plot=TRUE,x.high.cutoff = Inf,y.cutoff = 0.5) # deprecated
+EC=FindVariableFeatures(EC,mean.cutoff = c(-Inf, Inf) ,dispersion.cutoff = c(-Inf, 0.5))
 EC=RunPCA(EC,pc.genes=EC@var.genes)
-EC=FindClusters(EC,reduction.type = "pca",dims.use=1:20,force.recalc=TRUE)
+# EC=FindClusters(EC,reduction.type = "pca",dims.use=1:20,force.recalc=TRUE)
+EC <- FindNeighbors(EC, dims = 1:20)
+EC=FindClusters(EC)
 EC=RunTSNE(EC,dims.use=1:20,check_duplicates=F)
 
 pdf("EC.TSNE.pdf")
@@ -127,12 +191,15 @@ for(i in c(1:12)){
 mycols=rep("gray",12)
 mycols[i]="red"
 t=names(table(EC@meta.data$orig.ident))[i]
-mycells=EC@cell.names[which(EC@meta.data$orig.ident==t)]
-TSNEPlot(EC,pt.size=1.2, group.by = "orig.ident",colors.use = mycols)
-TSNEPlot(EC,pt.size=1.2, group.by = "mouse.id",cells.use = mycells)
-TSNEPlot(EC,pt.size=1.2, group.by = "mouse.sex",cells.use = mycells)
+# mycells=EC@cell.names[which(EC@meta.data$orig.ident==t)]
+mycells=colnames(EC)[which(EC@meta.data$orig.ident==t)]
+TSNEPlot(EC,pt.size=1.2, group.by = "orig.ident", cols = mycols)
+TSNEPlot(EC,pt.size=1.2, group.by = "mouse.id", cells = mycells)
+TSNEPlot(EC,pt.size=1.2, group.by = "mouse.sex", cells = mycells)
 }
 dev.off()
+
+# DGE analyses:
 
 lung=FilterCells(lung,subset.names=c("nGene","nReads"),low.thresholds = c(500,50000))
 lung=NormalizeData(lung,scale.factor=1e6)
