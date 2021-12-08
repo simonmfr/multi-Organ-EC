@@ -199,7 +199,7 @@ TSNEPlot(EC,pt.size=1.2, group.by = "mouse.sex", cells = mycells)
 }
 dev.off()
 
-# DGE analyses:
+# DEG analyses:
 
 lung=FilterCells(lung,subset.names=c("nGene","nReads"),low.thresholds = c(500,50000))
 lung=NormalizeData(lung,scale.factor=1e6)
